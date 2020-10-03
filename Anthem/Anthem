@@ -1,0 +1,214 @@
+Anthem
+
+Exploit a Windows machine in this beginner level challenge.
+
+Title
+	Anthem VM
+
+IP Address
+	10.10.228.44 
+
+
+
+ [Task 1] Website Analysis
+
+#1 	
+
+Let's run nmap and check what ports are open.
+...
+No Answer
+...
+
+#2 	
+
+What port is for the web server?
+...
+80
+...
+
+
+#3 	
+
+What port is for remote desktop service?
+...
+3389
+...
+
+
+#4 	
+
+What is a possible password in one of the pages web crawlers check for?
+...
+UmbracoIsTheBest!
+...
+
+
+#5 	
+
+What CMS is the website using?
+...
+umbraco
+...
+
+
+#6 	What is the domain of the website?
+...
+anthem.com
+...
+
+
+#7 	
+
+What's the name of the Administrator
+...
+Solomon Grundy
+...
+
+
+
+#8 	
+
+Can we find find the email address of the administrator?
+...
+SG@anthemm.com
+...
+
+
+
+lets run nmap
+in nmap result we found robots.txt direcotry
+
+open the directory in new tab 
+http://10.10.228.44/robots.txt
+
+		UmbracoIsTheBest!											//4th answer
+
+		# Use for all search robots
+		User-agent: *
+
+		# Define the directories not to crawl
+		Disallow: /bin/
+		Disallow: /config/
+		Disallow: /umbraco/												//5th answer
+		Disallow: /umbraco_client/
+
+
+first line is a possible password in one of the pages web
+
+and in the disallowed directory we found CMS (content management system platform)
+http://10.10.228.44/umbraco/
+
+
+by searching the poem of the article on google, we found the name called 
+Solomon Grundy
+and this can be the name of administrator
+
+in the article /we-are-hiring/ there is an email JD@anthem.com 
+by this email patter we use Solomon Grundy as SG@anthemm.com
+
+
+
+[Task 2] Spot the flags 
+#1 	
+
+What is flag 1?
+...
+THM{L0L_WH0_US3S_M3T4}
+...
+
+
+#2 	
+
+What is flag 2?
+...
+THM{G!T_G00D}
+...
+
+
+#3 	
+
+What is flag 3?
+...
+THM{L0L_WH0_D15}
+...
+
+
+#4 	
+
+What is flag 4?
+...
+THM{AN0TH3R_M3TA}
+...
+
+
+from the hint of #1 [Have we inspected the pages yet?]
+lets inspecte the first article 
+
+we found the first flag1 inside <head> and line 13 <meta content="THM{L0L_WH0_US3S_M3T4}" 					//flag 1
+
+
+for the second flag2 from the hint of #2 [Search for it]
+lets inspectet on search bar of the webpage, 
+and we get the flag 
+<input type="text" name="term" placeholder="Search... 								THM{G!T_G00D}" />			//flag 2
+
+
+for the third flag from the hint of #3 [Profile]
+there is an profile inside first article 
+
+	Jane Doe
+
+	Author for Anthem blog
+
+	Website: THM{L0L_WH0_D15}																	//flag 3
+
+
+
+for the forth flag open the second article and inspectet
+we found the flag inside 
+<head>
+<meta content="THM{AN0TH3R_M3TA}" property="og:description">									//flag 4
+
+
+
+
+
+[Task 3] Final stage 
+
+
+lets login to the RDP{}
+to do this we use Remmina Application
+
+we will use Solomon Grundy as SG
+and from task 1 possible password
+
+username : SG
+password : UmbracoIsTheBest!
+
+we got logedin, on the desktop there is a text file user
+and found our user flag
+
+THM{N00T_NO0T}																		//user flag
+
+
+by showing all hidden files
+we can see some hidden files and folders inside c:/
+there is hidden backup folder and a file called restore
+
+we cant open the file but we cant open it, because of permission 
+we can edit the permissions on it. Simply add yourself (username) to the permissions tab,
+therefore allowing yourself to access the file. 
+Finally, open it up and read the password.
+
+file has password : ChangeMeBaby1MoreTime
+
+
+now logout the corrent RDP session and login as 
+username : Administrator
+password : ChangeMeBaby1MoreTime
+
+and finelly we get the root flag on desktop
+
+THM{Y0U_4R3_1337}																	//root flag
+
+
